@@ -1,5 +1,6 @@
-import React from 'react';
-import { api } from '../utils/api'
+import React from "react";
+import { api } from "../utils/api.js";
+import Card from "./Card.js";
 
 
 
@@ -7,6 +8,7 @@ export default function Main(props) {
     const [ userName, setUserName] = React.useState('');
     const [ userDescription, setUserDescription ] = React.useState('');
     const [ userAvatar, setUserAvatar ] = React.useState('');
+    const [ cards, setCards ] = React.useState([]);
 
     React.useEffect(() => {
         api.getUserData()
@@ -18,6 +20,13 @@ export default function Main(props) {
             .catch((err) => {
                 console.log(err)
             });
+    }, []);
+
+    React.useEffect(() => {
+        api.getInitialCards()
+            .then((data) => {
+                setCards(data);
+            })
     }, []);
 
     return (
@@ -49,6 +58,19 @@ export default function Main(props) {
 
             <section className="cards content__cards">
                 <ul className="cards__list">
+                    {
+                        cards.map((card) => (
+                            <Card
+                                key={card._id}
+                                card={card}
+                                name={card.name}
+                                link={card.link}
+                                likes={card.likes}
+                                onCardClick={props.onCardClick}
+                            />
+                            )
+                        )
+                    }
 
                 </ul>
             </section>
