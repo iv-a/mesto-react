@@ -1,6 +1,17 @@
 import React from 'react';
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 export default function Card(props) {
+    const currentUser = React.useContext(CurrentUserContext);
+    const isOwn = props.card.owner._id === currentUser._id;
+    const cardDeleteButtonClassName = (
+        `card__delete-button ${isOwn ? '' : 'card__delete-button_disabled'}`
+    );
+    const isLiked = props.card.likes.some(i => i._id === currentUser._id);
+    const cardLikeButtonClassName = (
+        `card__like-button ${isLiked ? 'card__like-button_active' : ''}`
+    );
+
     function handleCardClick() {
         props.onCardClick(props.card);
     }
@@ -9,7 +20,7 @@ export default function Card(props) {
         <li
             className="card">
             <button
-                className="card__delete-button"
+                className={cardDeleteButtonClassName}
             />
             <button
                 className="card__open-photo-button"
@@ -30,7 +41,7 @@ export default function Card(props) {
                 <div
                     className="card__like-container">
                     <button
-                        className="card__like-button"
+                        className={cardLikeButtonClassName}
                         type="button"
                         aria-label="Нравится"/>
                     <p
