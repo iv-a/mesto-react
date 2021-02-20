@@ -5,6 +5,7 @@ import Footer from "./Footer.js";
 import PopupWithForm from "./PopupWithForm.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
+import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import api from "../utils/Api.js";
@@ -15,6 +16,7 @@ function App() {
     const [ isEditAvatarPopupOpen, setIsEditAvatarPopupOpen ] = React.useState(false);
     const [ selectedCard, setSelectedCard ] = React.useState({});
     const [ currentUser, setCurrentUser] = React.useState({});
+    const [ cards, setCards ] = React.useState([]);
 
     React.useEffect(() => {
         api.getUserData()
@@ -25,6 +27,39 @@ function App() {
                 console.log(err)
             });
     }, []);
+
+    React.useEffect(() => {
+        api.getInitialCards()
+            .then((data) => {
+                setCards(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+    }, []);
+
+    function handleCardLike(card) {
+        const isLiked = card.likes.some(i => i._id === currentUser._id);
+        api.changeLikeCardStatus(card._id, isLiked)
+            .then((newCard) => {
+                const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+                setCards(newCards);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    function handleCardDelete(card) {
+        api.deleteCard(card._id)
+            .then(() => {
+                const newCards = cards.filter((c) => c._id !== card._id);
+                setCards(newCards);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
 
     function handleEditAvatarClick() {
         setIsEditAvatarPopupOpen(true);
@@ -69,10 +104,20 @@ function App() {
     }
 
     function handleUpdateAvatar(data) {
-        // console.log(data);
         api.changeUserAvatar(data)
             .then((userData) => {
                 setCurrentUser(userData);
+                closeAllPopups();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    function handleAddPlaceSubmit({ name, link }) {
+        api.postNewCard({ name, link })
+            .then((newCard) => {
+                setCards([newCard, ...cards]);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -99,6 +144,9 @@ function App() {
                       onAddPlace={handleAddPlaceClick}
                       onEditAvatar={handleEditAvatarClick}
                       onCardClick={setSelectedCard}
+                      cards={cards}
+                      onCardLike={handleCardLike}
+                      onCardDelete={handleCardDelete}
                   />
                   <Footer/>
 
@@ -115,42 +163,10 @@ function App() {
                       onUpdateAvatar={handleUpdateAvatar}
                   />
 
-                  <PopupWithForm
-                      name="add-card"
-                      title="Новое место"
-                      buttonText="Создать"
+                  <AddPlacePopup
                       isOpen={isAddPlacePopupOpen}
                       onClose={closeAllPopups}
-                      children={
-                          <>
-                              <input
-                                  className="popup__input popup__input_type_place"
-                                  id="place-input"
-                                  type="text"
-                                  name="placeInput"
-                                  placeholder="Название"
-                                  minLength="2"
-                                  maxLength="30"
-                                  required
-                              />
-                              <span
-                                  className="popup__input-error"
-                                  id="place-input-error"
-                              />
-                              <input
-                                  className="popup__input popup__input_type_link"
-                                  id="link-input"
-                                  type="url"
-                                  name="linkInput"
-                                  placeholder="Ссылка на картинку"
-                                  required
-                              />
-                              <span
-                                  className="popup__input-error"
-                                  id="link-input-error"
-                              />
-                          </>
-                      }
+                      onAddPlace={handleAddPlaceSubmit}
                   />
 
 
