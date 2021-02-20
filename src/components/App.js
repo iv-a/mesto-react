@@ -4,6 +4,7 @@ import Main from "./Main.js";
 import Footer from "./Footer.js";
 import PopupWithForm from "./PopupWithForm.js";
 import EditProfilePopup from "./EditProfilePopup.js";
+import EditAvatarPopup from "./EditAvatarPopup.js";
 import ImagePopup from "./ImagePopup.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import api from "../utils/Api.js";
@@ -67,6 +68,18 @@ function App() {
             });
     }
 
+    function handleUpdateAvatar(data) {
+        // console.log(data);
+        api.changeUserAvatar(data)
+            .then((userData) => {
+                setCurrentUser(userData);
+                closeAllPopups();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     React.useEffect(() => {
         document.addEventListener('keydown', handleEscClose);
         document.addEventListener('mouseup', handleOverlayClose);
@@ -94,6 +107,12 @@ function App() {
                       onClose={closeAllPopups}
                       onUpdateUser={handleUpdateUser}
 
+                  />
+
+                  <EditAvatarPopup
+                      isOpen={isEditAvatarPopupOpen}
+                      onClose={closeAllPopups}
+                      onUpdateAvatar={handleUpdateAvatar}
                   />
 
                   <PopupWithForm
@@ -134,29 +153,7 @@ function App() {
                       }
                   />
 
-                  <PopupWithForm
-                      name="change-avatar"
-                      title="Обновить аватар"
-                      buttonText="Сохранить"
-                      isOpen={isEditAvatarPopupOpen}
-                      onClose={closeAllPopups}
-                      children={
-                          <>
-                              <input
-                                  className="popup__input popup__input_type_link"
-                                  id="avatar-link-input"
-                                  type="url"
-                                  name="avatarLinkInput"
-                                  placeholder="Ссылка на картинку"
-                                  required
-                              />
-                              <span
-                                  className="popup__input-error"
-                                  id="avatar-link-input-error"
-                              />
-                          </>
-                      }
-                  />
+
 
                   <PopupWithForm
                       name="confirm"
