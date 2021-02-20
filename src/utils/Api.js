@@ -42,26 +42,10 @@ class Api {
             .then(res => this._getResponse(res))
     }
 
-    deleteCard(card) {
-        return fetch(`${this.baseUrl}/cards/${card['_id']}`, {
+    deleteCard(cardId) {
+        return fetch(`${this.baseUrl}/cards/${cardId}`, {
             method: 'DELETE',
             headers: this.headers,
-        })
-            .then(res => this._getResponse(res))
-    }
-
-    addLike(card) {
-        return fetch(`${this.baseUrl}/cards/likes/${card['cardId']} `, {
-            method: 'PUT',
-            headers: this.headers
-        })
-            .then(res => this._getResponse(res))
-    }
-
-    removeLike(card) {
-        return fetch(`${this.baseUrl}/cards/likes/${card['cardId']}`, {
-            method: 'DELETE',
-            headers: this.headers
         })
             .then(res => this._getResponse(res))
     }
@@ -83,6 +67,22 @@ class Api {
         }
 
         return Promise.reject(`Ошибка: ${res.status}`);
+    }
+
+    changeLikeCardStatus(cardId, isLiked) {
+        if (!isLiked) {
+            return fetch(`${this.baseUrl}/cards/likes/${cardId} `, {
+                method: 'PUT',
+                headers: this.headers
+            })
+                .then(res => this._getResponse(res));
+        } else {
+            return fetch(`${this.baseUrl}/cards/likes/${cardId}`, {
+                method: 'DELETE',
+                headers: this.headers
+            })
+                .then(res => this._getResponse(res));
+        }
     }
 }
 

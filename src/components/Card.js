@@ -15,12 +15,22 @@ export default function Card(props) {
     function handleCardClick() {
         props.onCardClick(props.card);
     }
+    
+    function handleLikeClick () {
+        props.onCardLike(props.card);
+        // console.log(props.card)
+    }
+
+    function handleDeleteClick() {
+        props.onCardDelete(props.card);
+    }
 
     return (
         <li
             className="card">
             <button
                 className={cardDeleteButtonClassName}
+                onClick={handleDeleteClick}
             />
             <button
                 className="card__open-photo-button"
@@ -43,7 +53,9 @@ export default function Card(props) {
                     <button
                         className={cardLikeButtonClassName}
                         type="button"
-                        aria-label="Нравится"/>
+                        aria-label="Нравится"
+                        onClick={handleLikeClick}
+                    />
                     <p
                         className="card__like-counter">{props.likes.length}
                     </p>
