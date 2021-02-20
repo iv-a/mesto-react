@@ -16,7 +16,8 @@ export default function PopupWithForm(props) {
                 <form
                     className="popup__form"
                     name={props.name}
-                    noValidate>
+                    noValidate
+                    onSubmit={props.onSubmit}>
                     {props.children}
                     <button
                         className="popup__save-button"
