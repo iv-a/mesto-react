@@ -1,6 +1,14 @@
 {
   "name": "mesto-react",
   "version": "0.1.0",
+  "description": "Проект представляет собой сервис Mesto: интерактивную страницу, куда можно добавлять фотографии, удалять их и ставить лайки.",
+  "author": "Artem Ivanov",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zyoma689/mesto-react.git"
+  },
+  "homepage": "https://github.com/Zyoma689/mesto-react#readme",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",

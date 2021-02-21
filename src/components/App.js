@@ -8,7 +8,7 @@ import EditAvatarPopup from "./EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
-import api from "../utils/Api.js";
+import api from "../utils/api.js";
 
 function App() {
     const [ isEditProfilePopupOpen, setIsEditProfilePopupOpen ] = React.useState(false);
@@ -17,26 +17,20 @@ function App() {
     const [ selectedCard, setSelectedCard ] = React.useState({});
     const [ currentUser, setCurrentUser] = React.useState({});
     const [ cards, setCards ] = React.useState([]);
+    const [ isLoading, setIsLoading ] = React.useState(false);
 
     React.useEffect(() => {
-        api.getUserData()
-            .then((data) => {
-                setCurrentUser(data);
+        Promise.all([api.getUserData(), api.getInitialCards()])
+            .then((values) => {
+                const [userData, initialCards] = values;
+                setCurrentUser(userData);
+                setCards(initialCards);
             })
             .catch((err) => {
                 console.log(err)
             });
     }, []);
 
-    React.useEffect(() => {
-        api.getInitialCards()
-            .then((data) => {
-                setCards(data);
-            })
-            .catch((err) => {
-                console.log(err)
-            });
-    }, []);
 
     function handleCardLike(card) {
         const isLiked = card.likes.some(i => i._id === currentUser._id);
@@ -93,9 +87,11 @@ function App() {
     }
 
     function handleUpdateUser(currentUser) {
+        setIsLoading(true);
         api.editUserData(currentUser)
             .then((data) => {
                 setCurrentUser(data);
+                setIsLoading(false);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -104,9 +100,11 @@ function App() {
     }
 
     function handleUpdateAvatar(data) {
+        setIsLoading(true);
         api.changeUserAvatar(data)
             .then((userData) => {
                 setCurrentUser(userData);
+                setIsLoading(false);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -115,9 +113,11 @@ function App() {
     }
 
     function handleAddPlaceSubmit({ name, link }) {
+        setIsLoading(true);
         api.postNewCard({ name, link })
             .then((newCard) => {
                 setCards([newCard, ...cards]);
+                setIsLoading(false);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -154,22 +154,22 @@ function App() {
                       isOpen={isEditProfilePopupOpen}
                       onClose={closeAllPopups}
                       onUpdateUser={handleUpdateUser}
-
+                      isLoading={isLoading}
                   />
 
                   <EditAvatarPopup
                       isOpen={isEditAvatarPopupOpen}
                       onClose={closeAllPopups}
                       onUpdateAvatar={handleUpdateAvatar}
+                      isLoading={isLoading}
                   />
 
                   <AddPlacePopup
                       isOpen={isAddPlacePopupOpen}
                       onClose={closeAllPopups}
                       onAddPlace={handleAddPlaceSubmit}
+                      isLoading={isLoading}
                   />
-
-
 
                   <PopupWithForm
                       name="confirm"

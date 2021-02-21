@@ -5,6 +5,13 @@ export default function AddPlacePopup(props) {
     const [ place, setPlace ] = React.useState('');
     const [ link, setLink ] = React.useState('');
 
+    React.useEffect(() => {
+        if (!props.isOpen) {
+            setPlace('');
+            setLink('');
+        }
+    }, [props.isOpen]);
+
     function handleChangePlace(evt) {
         setPlace(evt.target.value);
     }
@@ -22,7 +29,7 @@ export default function AddPlacePopup(props) {
         <PopupWithForm
             name="add-card"
             title="Новое место"
-            buttonText="Создать"
+            buttonText={props.isLoading ? "Создание..." : "Создать"}
             isOpen={props.isOpen}
             onClose={props.onClose}
             onSubmit={handleSubmit}
@@ -38,6 +45,7 @@ export default function AddPlacePopup(props) {
                         maxLength="30"
                         required
                         onChange={handleChangePlace}
+                        value={place}
                     />
                     <span
                         className="popup__input-error"
@@ -51,6 +59,7 @@ export default function AddPlacePopup(props) {
                         placeholder="Ссылка на картинку"
                         required
                         onChange={handleChangeLink}
+                        value={link}
                     />
                     <span
                         className="popup__input-error"

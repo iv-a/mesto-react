@@ -17,5 +17,5 @@
 * Работа с макетом в **Figma**
 ***
 ### Ссылки:
-* [Проектная работа на GitHub Pages]()
+* [Проектная работа на GitHub Pages](https://zyoma689.github.io/mesto-react/index.html)
 * [Макет Figma](https://www.figma.com/file/StZjf8HnoeLdiXS7dYrLAh/JavaScript.-Sprint-4)
