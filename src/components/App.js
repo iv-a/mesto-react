@@ -2,11 +2,11 @@ import React from 'react';
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Footer from "./Footer.js";
-import PopupWithForm from "./PopupWithForm.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
+import ConfirmPopup from "./ConfirmPopup.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import api from "../utils/api.js";
 
@@ -14,10 +14,12 @@ function App() {
     const [ isEditProfilePopupOpen, setIsEditProfilePopupOpen ] = React.useState(false);
     const [ isAddPlacePopupOpen, setIsAddPlacePopupOpen ] = React.useState(false);
     const [ isEditAvatarPopupOpen, setIsEditAvatarPopupOpen ] = React.useState(false);
+    const [ isConfirmPopupOpen, setIsConfirmPopupOpen ] = React.useState(false);
     const [ selectedCard, setSelectedCard ] = React.useState({});
     const [ currentUser, setCurrentUser] = React.useState({});
     const [ cards, setCards ] = React.useState([]);
     const [ isLoading, setIsLoading ] = React.useState(false);
+    const [ removedCard, setRemovedCard ] = React.useState({});
 
     React.useEffect(() => {
         Promise.all([api.getUserData(), api.getInitialCards()])
@@ -44,11 +46,19 @@ function App() {
             });
     }
 
+    function handleCardDeleteClick(card) {
+        setIsConfirmPopupOpen(true);
+        setRemovedCard(card);
+    }
+
     function handleCardDelete(card) {
+        setIsLoading(true);
         api.deleteCard(card._id)
             .then(() => {
                 const newCards = cards.filter((c) => c._id !== card._id);
                 setCards(newCards);
+                closeAllPopups();
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.log(err);
@@ -71,6 +81,7 @@ function App() {
         setIsEditProfilePopupOpen(false);
         setIsAddPlacePopupOpen(false);
         setIsEditAvatarPopupOpen(false);
+        setIsConfirmPopupOpen(false);
         setSelectedCard({})
     }
 
@@ -146,7 +157,7 @@ function App() {
                       onCardClick={setSelectedCard}
                       cards={cards}
                       onCardLike={handleCardLike}
-                      onCardDelete={handleCardDelete}
+                      onCardDelete={handleCardDeleteClick}
                   />
                   <Footer/>
 
@@ -171,10 +182,12 @@ function App() {
                       isLoading={isLoading}
                   />
 
-                  <PopupWithForm
-                      name="confirm"
-                      title="Вы уверены?"
-                      buttonText="Да"
+                  <ConfirmPopup
+                      isOpen={isConfirmPopupOpen}
+                      onClose={closeAllPopups}
+                      onConfirm={handleCardDelete}
+                      card={removedCard}
+                      isLoading={isLoading}
                   />
 
                   <ImagePopup
